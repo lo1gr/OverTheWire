@@ -1,0 +1,148 @@
+Natas:
+For a level 99:
+link: http://natas99.natas.labs.overthewire.org
+username: natas99
+
+Level 0:
+username: natas0
+password: natas0
+url: http://natas0.natas.labs.overthewire.org
+
+To find password, view page source and look for password.
+
+Level 1:
+username: natas1
+password: gtVrDuiDfck831PqWsLEZy5gyDz1clto
+
+Right clicking is blocked so have to use shortcut: cmd + option + u to open page source.
+
+Level2:
+username: natas2
+password: ZluruAthQk7Q2MqmDeTiUij2ZvWy2mBi
+
+Check out page source with shortcut. We dont see any password. We see image at link http://natas2.natas.labs.overthewire.org/files/pixel.png
+So check out the link http://natas2.natas.labs.overthewire.org/files and find out a file called user.txt
+click on it -> password found!
+
+Level3:
+username: natas3
+password:sJIJNW6ucpu6HPZ1ZAchaDtwd7oGrD14
+
+Check out page source code. it says that "<!-- No more information leaks!! Not even Google will find it this time... -->
+"
+If Google cannot find it, that mean the crawlers cannot find it, so it could be a robots.txt file:
+http://natas3.natas.labs.overthewire.org/robots.txt
+Output is:
+User-agent: *
+Disallow: /s3cr3t/
+
+So let's check out the /s3cr3t/ folder: http://natas3.natas.labs.overthewire.org/s3cr3t/
+We find user.txt file -> password found!
+
+Level4:
+username: natas4
+password: Z9tkRkWmpt9Qr7XrR5jWRkgOU901swEZ
+
+This message: "Access disallowed. You are visiting from "" while authorized
+users should come only from "http://natas5.natas.labs.overthewire.org/""
+
+so have to fake where we come from, can do that with curl in the terminal:
+curl 'http://natas4.natas.labs.overthewire.org/' -H 'Referer: http://natas5.natas.labs.overthewire.org/' -u natas4
+-H specifies the Header, in that case a Referer
+
+-> password found!
+
+Level5:
+username: natas5
+password: iX6IOfmpN7AYOQGPwtn3fXpbaJVJcHfq
+
+need to check the cookies for that:
+right click > Inspect > Applications > Under storage: Cookies
+Now change logged in = 0 to logged in = 1
+refresh website. Password will be outputted on website!
+-> password found!
+
+Level6:
+link: http://natas6.natas.labs.overthewire.org/
+username: natas6
+password: aGoY4q2Dc6MgDq4oL4YtoKtyAg9PeHa1
+
+Have to enter a password to find the code.
+We click on the provided link to view source code and find following javascript:
+
+<?
+
+include "includes/secret.inc";
+
+    if(array_key_exists("submit", $_POST)) {
+        if($secret == $_POST['secret']) {
+        print "Access granted. The password for natas7 is <censored>";
+    } else {
+        print "Wrong secret";
+    }
+    }
+?>
+
+It checks the entered value against a secret obtained from the file 'includes/secret.inc'.
+Let's check out this file -> http://natas6.natas.labs.overthewire.org/includes/secret.inc
+
+Level7:
+link: http://natas7.natas.labs.overthewire.org/
+username: natas7
+password: 7z3hEENjQtflzgnT29q7wAvMNfZdh0i9
+
+We see a hint in the page source:
+<!-- hint: password for webuser natas8 is in /etc/natas_webpass/natas8 -->
+We see that the page structure is always: http://natas7.natas.labs.overthewire.org/index.php?page= then the page
+so we can try to put the hint after the page= like so:
+http://natas7.natas.labs.overthewire.org/index.php?page=/etc/natas_webpass/natas8
+-> password found!
+
+Level 8:
+DBfUBfqQG69KvJvJ1iAbMoIpwSNQ9bWe
+
+3d3d516343746d4d6d6c315669563362
+
+
+Level 9:
+username: natas9
+password: W0mMhUcRRnG8dcghE4qvk3JA9lGt8nDl
+
+There is a passcode to enter on the website. In the source code we find the
+following php excerpt:
+
+<?
+
+$encodedSecret = "3d3d516343746d4d6d6c315669563362";
+
+function encodeSecret($secret) {
+    return bin2hex(strrev(base64_encode($secret)));
+}
+
+if(array_key_exists("submit", $_POST)) {
+    if(encodeSecret($_POST['secret']) == $encodedSecret) {
+    print "Access granted. The password for natas9 is <censored>";
+    } else {
+    print "Wrong secret";
+    }
+}
+?>
+
+So the passcode we enter goes into a function, and the output is compared with the
+$encodedSecret variable.
+
+encodeSecret($passcode_entered) == "3d3d516343746d4d6d6c315669563362"
+
+So need to go from output, and reverse the functions in the right order to get the input.
+We need to run the following php command:
+
+echo base64_decode(strrev(pack("H*" , "3d3d516343746d4d6d6c315669563362")))
+This gives us: oubWYf2kBq
+which we input in the website then submit.
+--> password found!
+
+
+Level 10:
+password: W0mMhUcRRnG8dcghE4qvk3JA9lGt8nDl
+
+dd
